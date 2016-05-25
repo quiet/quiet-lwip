@@ -13,7 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 Author: Brian Armstrong <brian.armstrong.ece+github@gmail.com>
 
-License for lwIP preserved below.
+License for lwIP preserved below. quiet-lwip is distributed with all source material for lwIP.
 
 /*
  * Copyright (c) 2001, 2002 Swedish Institute of Computer Science.
