@@ -4,14 +4,7 @@
 static err_t quiet_lwip_encode_frame(struct netif *netif, struct pbuf *p) {
     eth_driver *driver = (eth_driver*)netif->state;
 
-    pbuf_header(p, -ETH_PAD_SIZE);
-
-    size_t len = 0;
-    for(struct pbuf *q = p; q != NULL; q = q->next) {
-        memcpy(driver->send_temp + len, q->payload, q->len);
-        // XXX check over send_temp_len?
-        len += q->len;
-    }
+    size_t len = pbuf2buf(driver->send_temp, p);
 
     quiet_encoder_send(driver->encoder, driver->send_temp, len);
 
@@ -20,13 +13,10 @@ static err_t quiet_lwip_encode_frame(struct netif *netif, struct pbuf *p) {
     // it might be sending lots of 0 packets, but that would be simpler
     // than starting and stopping the stream as data appears
 
-    pbuf_header(p, ETH_PAD_SIZE);
-
     LINK_STATS_INC(link.xmit);
 
     return ERR_OK;
 }
-
 
 // quiet -> hw: call user code to send audio samples to hw
 ssize_t quiet_lwip_get_next_audio_packet(struct netif *netif, quiet_sample_t *buf, size_t samplebuf_len) {
@@ -43,20 +33,12 @@ static struct pbuf *quiet_lwip_fetch_single_frame(struct netif *netif) {
         // all done
         return NULL;
     }
-    len += ETH_PAD_SIZE;
-    struct pbuf *p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
+    struct pbuf *p = buf2pbuf(driver->recv_temp, len);
     if (!p) {
         LINK_STATS_INC(link.memerr);
         LINK_STATS_INC(link.drop);
         return NULL;
     }
-    size_t copied = 0;
-    for(struct pbuf *q = p; q != NULL; q = q->next) {
-        memcpy(q->payload, driver->recv_temp + copied, q->len);
-        copied += q->len;
-    }
-
-    pbuf_header(p, ETH_PAD_SIZE);
 
     LINK_STATS_INC(link.recv);
 
@@ -75,29 +57,7 @@ static void quiet_lwip_process_audio(struct netif *netif) {
             break;
         }
 
-        struct eth_hdr *ethhdr = p->payload;
-
-        switch (htons(ethhdr->type)) {
-        /* IP or ARP packet? */
-        case ETHTYPE_IP:
-        case ETHTYPE_ARP:
-#if PPPOE_SUPPORT
-        /* PPPoE packet? */
-        case ETHTYPE_PPPOEDISC:
-        case ETHTYPE_PPPOE:
-#endif /* PPPOE_SUPPORT */
-            /* full packet send to tcpip_thread to process */
-            if (netif->input(p, netif) != ERR_OK) {
-                LWIP_DEBUGF(NETIF_DEBUG, ("quiet_process_audio: IP input error\n"));
-                pbuf_free(p);
-                p = NULL;
-            }
-            break;
-        default:
-            pbuf_free(p);
-            p = NULL;
-            break;
-        }
+        recv_pbuf(netif, p);
     }
 }
 

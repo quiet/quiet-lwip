@@ -1,11 +1,6 @@
 #include "quiet-lwip.h"
 
-#include "lwip/def.h"
-#include "lwip/netif.h"
-#include "lwip/pbuf.h"
-#include "lwip/stats.h"
-#include "netif/etharp.h"
-#include "lwip/tcpip.h"
+#include "quiet-lwip/util.h"
 
 typedef struct {
     quiet_encoder *encoder;
