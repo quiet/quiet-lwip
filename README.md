@@ -120,7 +120,7 @@ Configuration
 -----------
 lwip, on its own, provides substantial configuration. In particular, you'll want to confirm that the settings in `include/lwip/lwip/opt.h` match your desired use case. This file specifies build-time #defines for important characteristics such as memory usage, number of concurrent connections, TCP MSS, and more.
 
-Additionally, more configuration is provided at runtime for the quiet-to-lwip interface in a struct defined in `include/quiet-lwip.h`/`include/quiet-lwip-portaudio.h`. Here you will provide the desired MAC address of the interface as well as the encoder/decoder sample rate and configuration (see also [libquiet's profile system](https://github.com/quiet/quiet#profiles).
+Additionally, more configuration is provided at runtime for the quiet-to-lwip interface in a struct defined in `include/quiet-lwip.h`/`include/quiet-lwip-portaudio.h`. Here you will provide the desired MAC address of the interface as well as the encoder/decoder sample rate and configuration (see also [libquiet's profile system](https://github.com/quiet/quiet#profiles)).
 
 quiet-lwip can be configured to dump every packet it sees in hex format to stdout. This dump, run through `grep "received frame"`, can be then fed to `tools/dump2text.py` and finally Wireshark's `text2pcap -t "%Y-%m-%d %H:%M:%S."` to produce a proper pcap file. This pcap file can be viewed by any pcap viewer such as Wireshark.
 
