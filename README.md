@@ -18,6 +18,8 @@ In order to demonstrate that Quiet-lwip can be used in ordinary socket contexts,
 
 ** For convenience, I have run these examples below with client and server on the same laptop. ** If you want to confirm that there is no cheating taking place, you are welcome to inspect how these examples work. Except where noted, we'll be transmitting over the air but using the same speaker and mic, as if two people communicated to each other using the same mouth and ears.
 
+The examples can be built using the build instructions above, followed by `make examples`.
+
 ### Discovery
 
 Let's say we have a base station with a speaker and microphone, perhaps a laptop, and we want to connect to this base with a client in order to perform some transactions.
