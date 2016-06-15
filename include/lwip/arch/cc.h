@@ -32,6 +32,17 @@
 #ifndef LWIP_ARCH_CC_H
 #define LWIP_ARCH_CC_H
 
+/* see https://sourceforge.net/p/predef/wiki/OperatingSystems/ */
+#if defined __linux__
+#define LWIP_UNIX_LINUX
+#elif defined __APPLE__
+#define LWIP_UNIX_MACH
+#elif defined __OpenBSD__
+#define LWIP_UNIX_OPENBSD
+#elif defined __CYGWIN__
+#define LWIP_UNIX_CYGWIN
+#endif
+
 /* Include some files for defining library routines */
 #include <string.h>
 #include <sys/time.h>
