@@ -14,7 +14,7 @@ else()
     endif()
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wpedantic -Werror -Wall")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wpedantic -Wall -D_XOPEN_SOURCE=700")
 set(SRCFILES src/driver.c src/util.c)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
