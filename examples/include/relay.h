@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <pthread.h>
