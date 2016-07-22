@@ -43,11 +43,11 @@ int open_send(const char *addr) {
         return -1;
     }
 
-    struct sockaddr_in remote;
+    struct lwip_sockaddr_in remote;
     remote.sin_family = AF_INET;
     remote.sin_addr.s_addr = inet_addr(addr);
     remote.sin_port = htons(remote_port);
-    int res = lwip_connect(socket_fd, (struct sockaddr*)&remote, sizeof(remote));
+    int res = lwip_connect(socket_fd, (struct lwip_sockaddr*)&remote, sizeof(remote));
 
     if (res < 0) {
         printf("connect failed\n");

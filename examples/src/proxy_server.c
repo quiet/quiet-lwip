@@ -249,12 +249,12 @@ int open_recv(const char *addr) {
         return -1;
     }
 
-    struct sockaddr_in *local_addr = calloc(1, sizeof(struct sockaddr_in));
+    struct lwip_sockaddr_in *local_addr = calloc(1, sizeof(struct lwip_sockaddr_in));
     local_addr->sin_family = AF_INET;
     local_addr->sin_addr.s_addr = inet_addr(addr);
     local_addr->sin_port = htons(local_port);
 
-    int res = lwip_bind(socket_fd, (struct sockaddr *)local_addr, sizeof(struct sockaddr_in));
+    int res = lwip_bind(socket_fd, (struct lwip_sockaddr *)local_addr, sizeof(struct lwip_sockaddr_in));
     free(local_addr);
 
     if (res < 0) {
@@ -272,9 +272,9 @@ int open_recv(const char *addr) {
     return socket_fd;
 }
 
-int recv_connection(int socket_fd, struct sockaddr_in *recv_from) {
-    socklen_t recv_from_len = sizeof(recv_from);
-    return lwip_accept(socket_fd, (struct sockaddr *)recv_from, &recv_from_len);
+int recv_connection(int socket_fd, struct lwip_sockaddr_in *recv_from) {
+    lwip_socklen_t recv_from_len = sizeof(recv_from);
+    return lwip_accept(socket_fd, (struct lwip_sockaddr *)recv_from, &recv_from_len);
 }
 
 int main(int argc, char **argv) {
@@ -358,13 +358,16 @@ int main(int argc, char **argv) {
     uint8_t *buf = calloc(buf_len, sizeof(uint8_t));
 
     for (;;) {
-        struct sockaddr_in recv_from;
+        struct lwip_sockaddr_in recv_from;
         int conn_fd = recv_connection(recv_socket, &recv_from);
         if (conn_fd < 0) {
             continue;
         }
 
-        printf("received connection from %s\n", inet_ntoa(recv_from.sin_addr));
+        struct in_addr local_domain;
+        local_domain.s_addr = recv_from.sin_addr.s_addr;
+
+        printf("received connection from %s\n", inet_ntoa(local_domain));
 
         int res = socks_auth(conn_fd, buf, buf_len);
 
