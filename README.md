@@ -1,7 +1,7 @@
 [Quiet-lwip](https://github.com/quiet/quiet-lwip/)
 ===========
 
-[![Quiet Modem Chat](https://discordapp.com/api/guilds/290985648054206464/embed.png?style=shield)](https://discordapp.com/invite/TMKfR)
+[![Quiet Modem Chat](https://discordapp.com/api/guilds/290985648054206464/embed.png?style=shield)](https://discordapp.com/invite/eRw5UjF)
 
 This is a binding for [libquiet](https://github.com/quiet/quiet) to [lwip](https://savannah.nongnu.org/projects/lwip/). This binding can be used to create TCP and UDP connections over an audio channel. This channel may be speaker-to-mic ("over the air") or through a wired connection.
 
