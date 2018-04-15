@@ -698,7 +698,7 @@
  * LWIP_AUTOIP==1: Enable AUTOIP module.
  */
 #ifndef LWIP_AUTOIP
-#define LWIP_AUTOIP                     0
+#define LWIP_AUTOIP                     1
 #endif
 
 /**
@@ -815,12 +815,12 @@
  * transport.
  */
 #ifndef LWIP_DNS
-#define LWIP_DNS                        0
+#define LWIP_DNS                        1
 #endif
 
 /** DNS maximum number of entries to maintain locally. */
 #ifndef DNS_TABLE_SIZE
-#define DNS_TABLE_SIZE                  4
+#define DNS_TABLE_SIZE                  16
 #endif
 
 /** DNS maximum host name length supported in the name table. */
@@ -854,13 +854,13 @@
  *  that returns the IP address or INADDR_NONE if not found.
  */
 #ifndef DNS_LOCAL_HOSTLIST
-#define DNS_LOCAL_HOSTLIST              0
+#define DNS_LOCAL_HOSTLIST              1
 #endif /* DNS_LOCAL_HOSTLIST */
 
 /** If this is turned on, the local host-list can be dynamically changed
  *  at runtime. */
 #ifndef DNS_LOCAL_HOSTLIST_IS_DYNAMIC
-#define DNS_LOCAL_HOSTLIST_IS_DYNAMIC   0
+#define DNS_LOCAL_HOSTLIST_IS_DYNAMIC   1
 #endif /* DNS_LOCAL_HOSTLIST_IS_DYNAMIC */
 
 /*
@@ -1121,7 +1121,7 @@
  * LWIP_NETIF_API==1: Support netif api (in netifapi.c)
  */
 #ifndef LWIP_NETIF_API
-#define LWIP_NETIF_API                  0
+#define LWIP_NETIF_API                  1
 #endif
 
 /**

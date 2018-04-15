@@ -1,8 +1,9 @@
 #include "quiet-lwip/driver_portaudio.h"
 
 // lwip -> quiet: convert tx data frame to audio samples
-static err_t quiet_lwip_portaudio_encode_frame(struct netif *netif, struct pbuf *p) {
-    portaudio_eth_driver *driver = (portaudio_eth_driver*)netif->state;
+static err_t quiet_lwip_portaudio_encode_frame(struct netif *netif,
+                                               struct pbuf *p) {
+    portaudio_eth_driver *driver = (portaudio_eth_driver *)netif->state;
 
     size_t len = pbuf2buf(driver->send_temp, p);
 
@@ -22,7 +23,7 @@ static err_t quiet_lwip_portaudio_encode_frame(struct netif *netif, struct pbuf 
 
 // quiet -> hw: call user code to send audio samples to hw
 ssize_t quiet_lwip_portaudio_get_next_audio_packet(struct netif *netif) {
-    portaudio_eth_driver *driver = (portaudio_eth_driver*)netif->state;
+    portaudio_eth_driver *driver = (portaudio_eth_driver *)netif->state;
     ssize_t written;
     if (driver->tx_in_progress || !atomic_load(&driver->rx_in_progress)) {
         written = quiet_portaudio_encoder_emit(driver->encoder);
@@ -36,9 +37,11 @@ ssize_t quiet_lwip_portaudio_get_next_audio_packet(struct netif *netif) {
 }
 
 // quiet -> lwip: pull one received frame out of quiet's receive buffer
-static struct pbuf *quiet_lwip_portaudio_fetch_single_frame(struct netif *netif) {
-    portaudio_eth_driver *driver = (portaudio_eth_driver*)netif->state;
-    ssize_t len = quiet_portaudio_decoder_recv(driver->decoder, driver->recv_temp, driver->recv_temp_len);
+static struct pbuf *quiet_lwip_portaudio_fetch_single_frame(
+    struct netif *netif) {
+    portaudio_eth_driver *driver = (portaudio_eth_driver *)netif->state;
+    ssize_t len = quiet_portaudio_decoder_recv(
+        driver->decoder, driver->recv_temp, driver->recv_temp_len);
     // XXX negative len (quiet errors)
     if (len <= 0) {
         // all done
@@ -53,7 +56,8 @@ static struct pbuf *quiet_lwip_portaudio_fetch_single_frame(struct netif *netif)
 
     if (driver->frame_dump) {
         // emit the entire received frame with a timestamp and in hex format
-        // this is *very* noisy, but the resulting dump can be turned into a pcap
+        // this is *very* noisy, but the resulting dump can be turned into a
+        // pcap
         struct timeval now;
         gettimeofday(&now, NULL);
         char fmt[64], buf[64];
@@ -80,7 +84,8 @@ static void quiet_lwip_portaudio_process_audio(struct netif *netif) {
         struct pbuf *p = quiet_lwip_portaudio_fetch_single_frame(netif);
 
         if (!p) {
-            // quiet_lwip_fetch_single_frame returns NULL once recv buffer is empty
+            // quiet_lwip_fetch_single_frame returns NULL once recv buffer is
+            // empty
             break;
         }
 
@@ -90,13 +95,15 @@ static void quiet_lwip_portaudio_process_audio(struct netif *netif) {
 
 // hw -> quiet: receive audio samples from user/hw and decode to frame
 void quiet_lwip_portaudio_recv_audio_packet(struct netif *netif) {
-    portaudio_eth_driver *driver = (portaudio_eth_driver*)netif->state;
+    portaudio_eth_driver *driver = (portaudio_eth_driver *)netif->state;
     quiet_portaudio_decoder_consume(driver->decoder);
-    bool frame_open = quiet_portaudio_decoder_frame_in_progress(driver->decoder);
+    bool frame_open =
+        quiet_portaudio_decoder_frame_in_progress(driver->decoder);
     if (!frame_open) {
         if (driver->rx_wait_peer_frame < driver->rx_wait_peer_frame_thresh) {
             driver->rx_wait_peer_frame++;
-            if (driver->rx_wait_peer_frame == driver->rx_wait_peer_frame_thresh) {
+            if (driver->rx_wait_peer_frame ==
+                driver->rx_wait_peer_frame_thresh) {
                 atomic_store(&driver->rx_in_progress, false);
             }
         }
@@ -107,24 +114,30 @@ void quiet_lwip_portaudio_recv_audio_packet(struct netif *netif) {
     quiet_lwip_portaudio_process_audio(netif);
 }
 
-
 // TODO add capability for quiet to calculate its bps
 // based on frame length, number of samples in frame, sample rate?
-unsigned int portaudio_calculate_bps(const quiet_encoder *e) {
-    return 4000;
-}
+unsigned int portaudio_calculate_bps(const quiet_encoder *e) { return 4000; }
 
 static err_t quiet_lwip_portaudio_init(struct netif *netif) {
     quiet_lwip_portaudio_driver_config *conf =
-        (quiet_lwip_portaudio_driver_config*)netif->state;
+        (quiet_lwip_portaudio_driver_config *)netif->state;
 
-    quiet_portaudio_encoder *e = quiet_portaudio_encoder_create(conf->encoder_opt,
-            conf->encoder_device, conf->encoder_latency,
-            conf->encoder_sample_rate, conf->encoder_sample_size);
+    quiet_portaudio_encoder *e = quiet_portaudio_encoder_create(
+        conf->encoder_opt, conf->encoder_device, conf->encoder_latency,
+        conf->encoder_sample_rate, conf->encoder_sample_size);
 
-    quiet_portaudio_decoder *d = quiet_portaudio_decoder_create(conf->decoder_opt,
-            conf->decoder_device, conf->decoder_latency,
-            conf->decoder_sample_rate, conf->decoder_sample_size);
+    if (!e) {
+        return ERR_IF;
+    }
+
+    quiet_portaudio_decoder *d = quiet_portaudio_decoder_create(
+        conf->decoder_opt, conf->decoder_device, conf->decoder_latency,
+        conf->decoder_sample_rate, conf->decoder_sample_size);
+
+    if (!d) {
+        quiet_portaudio_encoder_destroy(e);
+        return ERR_IF;
+    }
 
     portaudio_eth_driver *driver = calloc(1, sizeof(portaudio_eth_driver));
     driver->encoder = e;
@@ -140,7 +153,7 @@ static err_t quiet_lwip_portaudio_init(struct netif *netif) {
     driver->rx_wait_peer_frame_thresh = 3;
 
     // TODO acquire this from config
-    driver->frame_dump = false;
+    driver->frame_dump = true;
 
     netif->state = driver;
 
@@ -165,30 +178,30 @@ static err_t quiet_lwip_portaudio_init(struct netif *netif) {
     driver->recv_temp_len = frame_len + ETH_PAD_SIZE;
     driver->recv_temp = malloc(driver->recv_temp_len * sizeof(uint8_t));
 
-    netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_LINK_UP;
+    netif->flags =
+        NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_LINK_UP;
 
     return ERR_OK;
 }
 
-quiet_lwip_portaudio_interface *quiet_lwip_portaudio_create(quiet_lwip_portaudio_driver_config *conf,
-                                                            quiet_lwip_ipv4_addr local_address,
-                                                            quiet_lwip_ipv4_addr netmask,
-                                                            quiet_lwip_ipv4_addr gateway) {
-    static bool has_lwip_init = false;
+quiet_lwip_portaudio_interface *quiet_lwip_portaudio_create(
+    quiet_lwip_portaudio_driver_config *conf,
+    quiet_lwip_ipv4_addr local_address, quiet_lwip_ipv4_addr netmask,
+    quiet_lwip_ipv4_addr gateway) {
+    quiet_lwip_init();
 
-    if (!has_lwip_init) {
-        tcpip_init(NULL, NULL);
-        has_lwip_init = true;
-    }
-
-    quiet_lwip_portaudio_interface *interface = malloc(1 * sizeof(quiet_lwip_portaudio_interface));
+    quiet_lwip_portaudio_interface *interface =
+        malloc(1 * sizeof(quiet_lwip_portaudio_interface));
     struct ip_addr addr, nm, gw;
     addr.addr = local_address;
     nm.addr = netmask;
     gw.addr = gateway;
-    netif_add(interface, &addr, &nm,
-              &gw, conf, quiet_lwip_portaudio_init,
-              tcpip_input);
+    interface = netif_add(interface, &addr, &nm, &gw, conf,
+                          quiet_lwip_portaudio_init, tcpip_input);
+    if (!interface) {
+        free(interface);
+        return NULL;
+    }
     netif_set_up(interface);
     return interface;
 }
@@ -205,7 +218,7 @@ typedef struct {
 } audio_loop_args;
 
 static void *emit_loop(void *args_v) {
-    audio_loop_args *args = (audio_loop_args*)args_v;
+    audio_loop_args *args = (audio_loop_args *)args_v;
     quiet_lwip_portaudio_interface *interface = args->interface;
     for (;;) {
         if (!quiet_lwip_portaudio_get_next_audio_packet(interface)) {
@@ -217,7 +230,7 @@ static void *emit_loop(void *args_v) {
 }
 
 static void *recv_loop(void *args_v) {
-    audio_loop_args *args = (audio_loop_args*)args_v;
+    audio_loop_args *args = (audio_loop_args *)args_v;
     quiet_lwip_portaudio_interface *interface = args->interface;
     for (;;) {
         if (atomic_load(&args->shutdown)) {
@@ -262,8 +275,10 @@ struct quiet_lwip_portaudio_audio_threads {
     audio_loop_args recv_args;
 };
 
-quiet_lwip_portaudio_audio_threads *quiet_lwip_portaudio_start_audio_threads(quiet_lwip_portaudio_interface *interface) {
-    quiet_lwip_portaudio_audio_threads *threads = calloc(1, sizeof(quiet_lwip_portaudio_audio_threads));
+quiet_lwip_portaudio_audio_threads *quiet_lwip_portaudio_start_audio_threads(
+    quiet_lwip_portaudio_interface *interface) {
+    quiet_lwip_portaudio_audio_threads *threads =
+        calloc(1, sizeof(quiet_lwip_portaudio_audio_threads));
 
     threads->recv_args.interface = interface;
     atomic_init(&threads->recv_args.shutdown, false);
@@ -276,7 +291,8 @@ quiet_lwip_portaudio_audio_threads *quiet_lwip_portaudio_start_audio_threads(qui
     return threads;
 }
 
-void quiet_lwip_portaudio_stop_audio_threads(quiet_lwip_portaudio_audio_threads *threads) {
+void quiet_lwip_portaudio_stop_audio_threads(
+    quiet_lwip_portaudio_audio_threads *threads) {
     atomic_store(&threads->emit_args.shutdown, true);
     atomic_store(&threads->recv_args.shutdown, true);
 

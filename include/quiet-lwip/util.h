@@ -4,6 +4,7 @@
 #include "lwip/stats.h"
 #include "netif/etharp.h"
 #include "lwip/tcpip.h"
+#include "lwip/ipv4/lwip/autoip.h"
 
 size_t pbuf2buf(uint8_t *buf, struct pbuf *p);
 

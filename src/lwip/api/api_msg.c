@@ -1419,7 +1419,7 @@ do_getaddr(struct api_msg_msg *msg)
         *(msg->msg.ad.port) = msg->conn->pcb.udp->local_port;
       } else {
         if ((msg->conn->pcb.udp->flags & UDP_FLAGS_CONNECTED) == 0) {
-          msg->err = ERR_CONN;
+          msg->err = ERR_CONN_WARN;
         } else {
           *(msg->msg.ad.port) = msg->conn->pcb.udp->remote_port;
         }

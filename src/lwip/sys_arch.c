@@ -377,7 +377,7 @@ sys_sem_new_internal(u8_t count)
   if (sem != NULL) {
     sem->c = count;
     pthread_condattr_init(&(sem->condattr));
-#ifndef LWIP_UNIX_MACH
+#if !(defined(LWIP_UNIX_MACH) || (defined(LWIP_UNIX_ANDROID) && __ANDROID_API__ < 21))
     pthread_condattr_setclock(&(sem->condattr), CLOCK_MONOTONIC);
 #endif
     pthread_cond_init(&(sem->cond), &(sem->condattr));
@@ -410,7 +410,7 @@ cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex, u32_t timeout)
 
   /* Get a timestamp and add the timeout value. */
   get_monotonic_time(&rtime1);
-#ifdef LWIP_UNIX_MACH
+#if defined(LWIP_UNIX_MACH) || (defined(LWIP_UNIX_ANDROID) && __ANDROID_API__ < 21)
   ts.tv_sec = timeout / 1000L;
   ts.tv_nsec = (timeout % 1000L) * 1000000L;
   ret = pthread_cond_timedwait_relative_np(cond, mutex, &ts);

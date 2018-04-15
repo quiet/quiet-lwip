@@ -33,7 +33,7 @@
 #define LWIP_ARCH_CC_H
 
 /* see https://sourceforge.net/p/predef/wiki/OperatingSystems/ */
-#if defined __linux__
+#if defined __linux__ && !defined __ANDROID__
 #define LWIP_UNIX_LINUX
 #elif defined __APPLE__
 #define LWIP_UNIX_MACH
@@ -41,6 +41,13 @@
 #define LWIP_UNIX_OPENBSD
 #elif defined __CYGWIN__
 #define LWIP_UNIX_CYGWIN
+#elif defined __ANDROID__
+#define LWIP_UNIX_ANDROID
+/* the next include defines __ANDROID_API__ */
+#include <android/api-level.h>
+#if __ANDROID_API__ >= 21
+#define SOCKLEN_T_DEFINED
+#endif
 #endif
 
 /* Include some files for defining library routines */
@@ -102,6 +109,10 @@ typedef uintptr_t  mem_ptr_t;
 #endif
 
 #define LWIP_RAND() ((u32_t)rand())
+
+#if defined(LWIP_UNIX_ANDROID) && defined(FD_SET)
+    typedef __kernel_fd_set fd_set;
+#endif
 
 struct sio_status_s;
 typedef struct sio_status_s sio_status_t;

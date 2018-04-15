@@ -143,12 +143,13 @@ static const int err_to_errno_table[] = {
   EWOULDBLOCK,   /* ERR_WOULDBLOCK -7      Operation would block.   */
   EADDRINUSE,    /* ERR_USE        -8      Address in use.          */
   EALREADY,      /* ERR_ISCONN     -9      Already connected.       */
-  ECONNABORTED,  /* ERR_ABRT       -10     Connection aborted.      */
-  ECONNRESET,    /* ERR_RST        -11     Connection reset.        */
-  ENOTCONN,      /* ERR_CLSD       -12     Connection closed.       */
-  ENOTCONN,      /* ERR_CONN       -13     Not connected.           */
-  EIO,           /* ERR_ARG        -14     Illegal argument.        */
-  -1,            /* ERR_IF         -15     Low-level netif error    */
+  ENOTCONN,      /* ERR_CONN_WARN  -10     Not connected.           */
+  ECONNABORTED,  /* ERR_ABRT       -11     Connection aborted.      */
+  ECONNRESET,    /* ERR_RST        -12     Connection reset.        */
+  ENOTCONN,      /* ERR_CLSD       -13     Connection closed.       */
+  ENOTCONN,      /* ERR_CONN       -14     Not connected.           */
+  EIO,           /* ERR_ARG        -15     Illegal argument.        */
+  -1,            /* ERR_IF         -16     Low-level netif error    */
 };
 
 #define ERR_TO_ERRNO_TABLE_SIZE \
@@ -158,6 +159,7 @@ static const int err_to_errno_table[] = {
   ((unsigned)(-(err)) < ERR_TO_ERRNO_TABLE_SIZE ? \
     err_to_errno_table[-(err)] : EIO)
 
+#define ERRNO 1
 #ifdef ERRNO
 #ifndef set_errno
 #define set_errno(err) errno = (err)
