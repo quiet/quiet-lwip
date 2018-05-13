@@ -1457,7 +1457,7 @@
  * SO_SNDTIMEO processing.
  */
 #ifndef LWIP_SO_SNDTIMEO
-#define LWIP_SO_SNDTIMEO                0
+#define LWIP_SO_SNDTIMEO                1
 #endif
 
 /**
@@ -1465,14 +1465,14 @@
  * SO_RCVTIMEO processing.
  */
 #ifndef LWIP_SO_RCVTIMEO
-#define LWIP_SO_RCVTIMEO                0
+#define LWIP_SO_RCVTIMEO                1
 #endif
 
 /**
  * LWIP_SO_RCVBUF==1: Enable SO_RCVBUF processing.
  */
 #ifndef LWIP_SO_RCVBUF
-#define LWIP_SO_RCVBUF                  0
+#define LWIP_SO_RCVBUF                  1
 #endif
 
 /**
@@ -1486,7 +1486,7 @@
  * SO_REUSE==1: Enable SO_REUSEADDR option.
  */
 #ifndef SO_REUSE
-#define SO_REUSE                        0
+#define SO_REUSE                        1
 #endif
 
 /**

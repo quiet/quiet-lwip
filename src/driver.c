@@ -125,10 +125,10 @@ void quiet_lwip_join_threads(quiet_lwip_interface *interface) {
 }
 
 // hw -> quiet: receive audio samples from user/hw and decode to frame
-void quiet_lwip_recv_audio_packet(struct netif *netif, quiet_sample_t *buf,
-                                  size_t samplebuf_len) {
+ssize_t quiet_lwip_recv_audio_packet(struct netif *netif, const quiet_sample_t *buf,
+                                     size_t samplebuf_len) {
     eth_driver *driver = (eth_driver *)netif->state;
-    quiet_decoder_consume(driver->decoder, buf, samplebuf_len);
+    return quiet_decoder_consume(driver->decoder, buf, samplebuf_len);
 }
 
 // TODO add capability for quiet to calculate its bps
@@ -229,6 +229,18 @@ quiet_lwip_interface *quiet_lwip_autoip(quiet_lwip_interface *interface) {
         return NULL;
     }
     return interface;
+}
+
+quiet_lwip_ipv4_addr quiet_lwip_get_local_address(quiet_lwip_interface *interface) {
+    return interface->ip_addr.addr;
+}
+
+quiet_lwip_ipv4_addr quiet_lwip_get_netmask(quiet_lwip_interface *interface) {
+    return interface->netmask.addr;
+}
+
+quiet_lwip_ipv4_addr quiet_lwip_get_gateway(quiet_lwip_interface *interface) {
+    return interface->gw.addr;
 }
 
 void quiet_lwip_close(quiet_lwip_interface *interface) {

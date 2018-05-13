@@ -106,6 +106,11 @@ int lwip_getaddrinfo(const char *nodename,
        const struct addrinfo *hints,
        struct addrinfo **res);
 
+u32_t lwip_inet_addr(const char *cp);
+int lwip_inet_aton(const char *cp, struct in_addr *addr);
+char *lwip_inet_ntoa(struct in_addr *addr);
+char *lwip_inet_ntoa_r(struct in_addr *addr, char *buf, int buflen);
+
 #if LWIP_COMPAT_SOCKETS
 #define gethostbyname(name) lwip_gethostbyname(name)
 #define gethostbyname_r(name, ret, buf, buflen, result, h_errnop) \

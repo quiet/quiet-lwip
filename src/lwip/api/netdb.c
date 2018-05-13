@@ -350,4 +350,27 @@ memerr:
   return EAI_MEMORY;
 }
 
+u32_t
+lwip_inet_addr(const char *cp)
+{
+  return ipaddr_addr(cp);
+}
+
+int
+lwip_inet_aton(const char *cp, struct in_addr *addr)
+{
+  return ipaddr_aton(cp, (struct ip_addr*)addr);
+}
+
+char *
+lwip_inet_ntoa(struct in_addr *addr)
+{
+  return ipaddr_ntoa((struct ip_addr*)addr);
+}
+
+char *
+lwip_inet_ntoa_r(struct in_addr *addr, char *buf, int buflen)
+{
+  return ipaddr_ntoa_r((struct ip_addr*)addr, buf, buflen);
+}
 #endif /* LWIP_DNS && LWIP_SOCKET */
